@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import AddToCartButton from "@/components/AddToCartButton";
+import AgeNutritionEvaluation from "@/components/AgeNutritionEvaluation";
 import BackButton from "@/components/BackButton";
 import NutrientPictogram from "@/components/NutrientPictogram";
-import { CATEGORY_LABEL, COMBO_ITEMS, getProductById } from "@/lib/mockData";
+import { COMBO_ITEMS } from "@/lib/mockData";
 import {
   carbLevel,
   fatLevel,
@@ -10,6 +12,8 @@ import {
   proteinLevel,
   sodiumLevel,
 } from "@/lib/nutrition";
+import { getProductById } from "@/lib/productHelpers";
+import { getConvenienceProducts } from "@/lib/products";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -17,13 +21,14 @@ type Props = {
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
-  const product = getProductById(id);
+  const products = getConvenienceProducts();
+  const product = getProductById(products, id);
 
   if (!product) {
     notFound();
   }
 
-  const isTodaysPick = getTodaysPickId(product.category) === product.id;
+  const isTodaysPick = getTodaysPickId(products, product.category) === product.id;
   const combo = getComboAdvice(product);
 
   return (
@@ -38,18 +43,19 @@ export default async function ProductPage({ params }: Props) {
       <main className="flex flex-1 flex-col gap-5 p-4">
         <section className="relative flex flex-col items-center gap-2 rounded-2xl bg-white p-8 shadow-sm">
           {isTodaysPick && (
-            <span className="absolute left-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-c-amber text-2xl shadow-sm">
-              ⭐
-            </span>
+            <span className="absolute left-4 top-4 text-2xl">👍</span>
           )}
           <span className="text-7xl">{product.emoji}</span>
           <span className="text-base font-bold text-gray-400">
-            {CATEGORY_LABEL[product.category]}
+            {product.category}
           </span>
           <span className="text-sm text-gray-400">{product.energyKcal} kcal</span>
+          {product.manufacturer && (
+            <span className="text-xs text-gray-300">{product.manufacturer}</span>
+          )}
         </section>
 
-        <section className="grid grid-cols-2 gap-4 rounded-2xl bg-white p-4 shadow-sm sm:grid-cols-4">
+        <section className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <NutrientPictogram
             label="단백질"
             emoji="💪"
@@ -109,6 +115,10 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
         </section>
+
+        <AgeNutritionEvaluation product={product} allProducts={products} />
+
+        <AddToCartButton product={product} />
       </main>
     </div>
   );

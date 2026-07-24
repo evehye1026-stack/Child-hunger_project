@@ -28,8 +28,12 @@ export default function NutrientPictogram({
   const filledClass = COLOR_CLASS[color];
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="flex gap-1">
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 p-3">
+      <div className="flex flex-col">
+        <span className="text-base font-bold text-gray-700">{label}</span>
+        <span className="text-sm text-gray-400">{valueText}</span>
+      </div>
+      <div className="flex shrink-0 gap-1">
         {[1, 2, 3].map((slot) => {
           const filled = slot <= level;
           const rotation = tilt && filled ? `rotate(${slot * 8}deg)` : undefined;
@@ -37,7 +41,7 @@ export default function NutrientPictogram({
             <span
               key={slot}
               style={rotation ? { transform: rotation } : undefined}
-              className={`flex h-11 w-11 items-center justify-center rounded-full text-2xl transition ${
+              className={`flex h-9 w-9 items-center justify-center rounded-full text-lg transition ${
                 filled ? filledClass : "bg-gray-200"
               }`}
             >
@@ -46,8 +50,6 @@ export default function NutrientPictogram({
           );
         })}
       </div>
-      <span className="text-base font-bold text-gray-500">{label}</span>
-      <span className="text-sm text-gray-400">{valueText}</span>
     </div>
   );
 }

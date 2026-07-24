@@ -1,38 +1,93 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { CATEGORY_EMOJI, CATEGORY_LABEL, getProductsByCategory } from "@/lib/mockData";
+import { useMemo, useState } from "react";
 import { getTodaysPickId } from "@/lib/nutrition";
-import type { Category } from "@/lib/types";
+import {
+  CATEGORY_EMOJI,
+  getCategoryList,
+  getMajorCategoryList,
+  getProductsByMajorCategory,
+  MAJOR_CATEGORY_EMOJI,
+} from "@/lib/productHelpers";
+import type { MajorCategory, Product } from "@/lib/types";
 
-const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
+type Tab = MajorCategory | "전체";
 
-export default function CategoryProductBrowser() {
-  const [category, setCategory] = useState<Category>(CATEGORIES[0]);
-  const products = getProductsByCategory(category);
-  const pickId = getTodaysPickId(category);
+const ALL_TAB = "전체" as const;
+
+type Props = {
+  products: Product[];
+};
+
+export default function CategoryProductBrowser({ products }: Props) {
+  const majorCategories = getMajorCategoryList(products);
+  const categories = getCategoryList(products);
+  const tabs: Tab[] = [ALL_TAB, ...majorCategories];
+  const [tab, setTab] = useState<Tab>(ALL_TAB);
+  const [query, setQuery] = useState("");
+
+  const searching = query.trim().length > 0;
+
+  const searchResults = useMemo(() => {
+    const q = query.trim();
+    if (!q) return [];
+    return products.filter((p) => p.name.includes(q));
+  }, [products, query]);
+
+  const tabProducts =
+    tab === ALL_TAB ? products : getProductsByMajorCategory(products, tab);
+
+  const pickIds = useMemo(
+    () => new Set(categories.map((c) => getTodaysPickId(products, c))),
+    [products, categories]
+  );
+
+  const visible = searching ? searchResults : tabProducts;
+  const showCategoryTag = searching || tab === ALL_TAB;
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => setCategory(c)}
-            className={`flex h-14 shrink-0 items-center gap-2 rounded-2xl px-4 text-lg font-bold shadow-sm transition active:scale-95 ${
-              category === c ? "bg-c-green text-white" : "bg-white text-gray-700"
-            }`}
-          >
-            <span className="text-2xl">{CATEGORY_EMOJI[c]}</span>
-            {CATEGORY_LABEL[c]}
-          </button>
-        ))}
+      <div className="rounded-2xl bg-c-green/10 p-4">
+        <p className="text-base font-bold text-c-green">
+          🔍 궁금한 음식이 있으면 이름을 검색해서 영양정보를 확인해봐요!
+        </p>
       </div>
 
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="상품 이름으로 검색 (예: 삼각김밥)"
+        className="h-14 w-full rounded-2xl border border-gray-100 bg-white px-4 text-lg font-bold text-gray-700 shadow-sm outline-none placeholder:text-gray-300"
+      />
+
+      {!searching && (
+        <div className="grid grid-cols-5 gap-2">
+          {tabs.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`flex h-16 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-center shadow-sm transition active:scale-95 ${
+                tab === t ? "bg-c-green text-white" : "bg-white text-gray-700"
+              }`}
+            >
+              <span className="text-xl">
+                {t === ALL_TAB ? "🍽️" : MAJOR_CATEGORY_EMOJI[t]}
+              </span>
+              <span className="text-[11px] font-bold leading-tight">{t}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {searching && (
+        <p className="text-sm text-gray-400">{visible.length}건 검색됨</p>
+      )}
+
       <ul className="flex flex-col gap-3">
-        {products.map((product) => (
+        {visible.map((product) => (
           <li key={product.id}>
             <Link
               href={`/product/${product.id}`}
@@ -41,20 +96,29 @@ export default function CategoryProductBrowser() {
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-3xl">
                 {product.emoji}
               </span>
-              <span className="flex-1 text-lg font-bold text-gray-800">
-                {product.name}
+              <span className="flex-1">
+                <span className="block text-lg font-bold text-gray-800">
+                  {product.name}
+                </span>
+                {showCategoryTag && (
+                  <span className="block text-sm text-gray-400">
+                    {CATEGORY_EMOJI[product.category]} {product.category}
+                  </span>
+                )}
               </span>
-              {product.id === pickId && (
-                <span
-                  aria-label="오늘의 추천"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-c-amber text-xl"
-                >
-                  ⭐
+              {pickIds.has(product.id) && (
+                <span aria-label="오늘의 추천" className="text-xl">
+                  👍
                 </span>
               )}
             </Link>
           </li>
         ))}
+        {searching && visible.length === 0 && (
+          <li className="py-8 text-center text-lg font-bold text-gray-400">
+            검색 결과가 없어요
+          </li>
+        )}
       </ul>
     </div>
   );

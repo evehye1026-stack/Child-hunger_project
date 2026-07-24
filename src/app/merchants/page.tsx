@@ -1,5 +1,5 @@
 import BackButton from "@/components/BackButton";
-import MerchantBrowser from "@/components/MerchantBrowser";
+import MerchantView from "@/components/MerchantView";
 import { getMerchantData } from "@/lib/merchants";
 
 export default function MerchantsPage() {
@@ -12,13 +12,13 @@ export default function MerchantsPage() {
         <div>
           <h1 className="text-xl font-bold text-gray-800">가맹점 데이터</h1>
           <p className="text-sm text-gray-400">
-            화곡동 아동급식카드 가맹점 샘플 (좌표 준비 중)
+            화곡동 아동급식카드 가맹점 샘플
           </p>
         </div>
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 pb-4">
-        <MerchantBrowser restaurants={restaurants} convenience={convenience} />
+        <MerchantView restaurants={restaurants} convenience={convenience} />
       </main>
     </div>
   );

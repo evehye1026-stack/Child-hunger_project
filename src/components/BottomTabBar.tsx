@@ -7,7 +7,8 @@ const TABS = [
   { href: "/", label: "홈", emoji: "🏠" },
   { href: "/map", label: "동네지도", emoji: "🗺️" },
   { href: "/nutrition", label: "편의점 영양 조회", emoji: "🔍" },
-  { href: "/recommend", label: "편의점 음식 추천", emoji: "⭐" },
+  { href: "/cart", label: "장바구니", emoji: "🛒" },
+  { href: "/mypage", label: "마이페이지", emoji: "👤" },
 ];
 
 export default function BottomTabBar() {

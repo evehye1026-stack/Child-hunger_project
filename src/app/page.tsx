@@ -1,8 +1,10 @@
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
 import { distanceMeters, walkMinutes } from "@/lib/distance";
-import { MY_LOCATION, STORES, getProductById } from "@/lib/mockData";
+import { MY_LOCATION, STORES } from "@/lib/mockData";
 import { getOverallTodaysPickId } from "@/lib/nutrition";
+import { getProductById } from "@/lib/productHelpers";
+import { getConvenienceProducts } from "@/lib/products";
 
 const FEATURES = [
   { href: "/map", emoji: "🗺️", title: "동네지도", desc: "식당·편의점" },
@@ -11,7 +13,8 @@ const FEATURES = [
 ];
 
 export default function Home() {
-  const pick = getProductById(getOverallTodaysPickId());
+  const products = getConvenienceProducts();
+  const pick = getProductById(products, getOverallTodaysPickId(products));
 
   const nearby = STORES.filter((s) => !s.closed)
     .map((store) => ({ store, meters: distanceMeters(MY_LOCATION, store) }))
@@ -62,9 +65,7 @@ export default function Home() {
                   {pick.energyKcal} kcal
                 </span>
               </span>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-c-amber text-xl">
-                ⭐
-              </span>
+              <span className="text-xl">👍</span>
             </Link>
           </section>
         )}

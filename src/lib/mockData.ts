@@ -1,23 +1,7 @@
-import type { Category, ComboItem, Product, Store } from "./types";
+import type { ComboItem, Store } from "./types";
 
 // 강서구 대략 중심점 (내 위치 목업)
 export const MY_LOCATION = { lat: 37.5509, lng: 126.8495 };
-
-export const CATEGORY_LABEL: Record<Category, string> = {
-  riceball: "삼각김밥",
-  lunchbox: "도시락",
-  sandwich: "샌드위치",
-  drink: "음료",
-  snack: "간식",
-};
-
-export const CATEGORY_EMOJI: Record<Category, string> = {
-  riceball: "🍙",
-  lunchbox: "🍱",
-  sandwich: "🥪",
-  drink: "🥤",
-  snack: "🍿",
-};
 
 export const STORES: Store[] = [
   {
@@ -113,139 +97,6 @@ export const STORES: Store[] = [
   },
 ];
 
-export const PRODUCTS: Product[] = [
-  {
-    id: "p1",
-    storeType: "convenience",
-    category: "riceball",
-    name: "참치마요 삼각김밥",
-    emoji: "🍙",
-    energyKcal: 180,
-    carbG: 30,
-    proteinG: 4,
-    fatG: 6,
-    sodiumMg: 380,
-    veggieLevel: 1,
-  },
-  {
-    id: "p2",
-    storeType: "convenience",
-    category: "riceball",
-    name: "전주비빔 삼각김밥",
-    emoji: "🍙",
-    energyKcal: 170,
-    carbG: 32,
-    proteinG: 4,
-    fatG: 3,
-    sodiumMg: 420,
-    veggieLevel: 2,
-  },
-  {
-    id: "p3",
-    storeType: "convenience",
-    category: "lunchbox",
-    name: "제육볶음 도시락",
-    emoji: "🍱",
-    energyKcal: 650,
-    carbG: 85,
-    proteinG: 22,
-    fatG: 18,
-    sodiumMg: 950,
-    veggieLevel: 2,
-  },
-  {
-    id: "p4",
-    storeType: "convenience",
-    category: "lunchbox",
-    name: "치킨가라아게 도시락",
-    emoji: "🍱",
-    energyKcal: 720,
-    carbG: 78,
-    proteinG: 25,
-    fatG: 26,
-    sodiumMg: 1100,
-    veggieLevel: 1,
-  },
-  {
-    id: "p5",
-    storeType: "convenience",
-    category: "sandwich",
-    name: "에그마요 샌드위치",
-    emoji: "🥪",
-    energyKcal: 310,
-    carbG: 34,
-    proteinG: 11,
-    fatG: 13,
-    sodiumMg: 480,
-    veggieLevel: 2,
-  },
-  {
-    id: "p6",
-    storeType: "convenience",
-    category: "sandwich",
-    name: "햄치즈 샌드위치",
-    emoji: "🥪",
-    energyKcal: 340,
-    carbG: 36,
-    proteinG: 13,
-    fatG: 15,
-    sodiumMg: 690,
-    veggieLevel: 2,
-  },
-  {
-    id: "p7",
-    storeType: "convenience",
-    category: "drink",
-    name: "흰우유 200ml",
-    emoji: "🥛",
-    energyKcal: 130,
-    carbG: 10,
-    proteinG: 6,
-    fatG: 7,
-    sodiumMg: 100,
-    veggieLevel: 1,
-  },
-  {
-    id: "p8",
-    storeType: "convenience",
-    category: "drink",
-    name: "탄산음료 500ml",
-    emoji: "🥤",
-    energyKcal: 225,
-    carbG: 57,
-    proteinG: 0,
-    fatG: 0,
-    sodiumMg: 35,
-    veggieLevel: 1,
-  },
-  {
-    id: "p9",
-    storeType: "convenience",
-    category: "snack",
-    name: "구운계란 2입",
-    emoji: "🥚",
-    energyKcal: 140,
-    carbG: 1,
-    proteinG: 12,
-    fatG: 10,
-    sodiumMg: 220,
-    veggieLevel: 1,
-  },
-  {
-    id: "p10",
-    storeType: "convenience",
-    category: "snack",
-    name: "감자칩 한 봉",
-    emoji: "🍟",
-    energyKcal: 300,
-    carbG: 33,
-    proteinG: 3,
-    fatG: 18,
-    sodiumMg: 380,
-    veggieLevel: 1,
-  },
-];
-
 // 조합 추천용 보완 상품 (단백질 낮을 때 함께 안내)
 export const COMBO_ITEMS: ComboItem[] = [
   { id: "combo-egg", name: "계란", emoji: "🥚" },
@@ -253,14 +104,6 @@ export const COMBO_ITEMS: ComboItem[] = [
   { id: "combo-soymilk", name: "두유", emoji: "🧃" },
 ];
 
-export function getProductsByCategory(category: Category): Product[] {
-  return PRODUCTS.filter((p) => p.category === category);
-}
-
 export function getStoreById(id: string): Store | undefined {
   return STORES.find((s) => s.id === id);
-}
-
-export function getProductById(id: string): Product | undefined {
-  return PRODUCTS.find((p) => p.id === id);
 }
