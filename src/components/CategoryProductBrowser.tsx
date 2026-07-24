@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import Icon from "@/components/Icon";
 import { getTodaysPickId } from "@/lib/nutrition";
 import {
   CATEGORY_EMOJI,
@@ -44,7 +45,6 @@ export default function CategoryProductBrowser({ products }: Props) {
   );
 
   const visible = searching ? searchResults : tabProducts;
-  const showCategoryTag = searching || tab === ALL_TAB;
 
   return (
     <div className="flex flex-col gap-4">
@@ -94,17 +94,16 @@ export default function CategoryProductBrowser({ products }: Props) {
               className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 transition active:scale-[0.98]"
             >
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-3xl">
-                {product.emoji}
+                <Icon icon={product.emoji} />
               </span>
               <span className="flex-1">
                 <span className="block text-lg font-bold text-gray-800">
                   {product.name}
                 </span>
-                {showCategoryTag && (
-                  <span className="block text-sm text-gray-400">
-                    {CATEGORY_EMOJI[product.category]} {product.category}
-                  </span>
-                )}
+                <span className="block text-sm text-gray-400">
+                  <Icon icon={CATEGORY_EMOJI[product.category]} />{" "}
+                  {product.category}
+                </span>
               </span>
               {pickIds.has(product.id) && (
                 <span aria-label="오늘의 추천" className="text-xl">

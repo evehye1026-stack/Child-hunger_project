@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import Icon from "@/components/Icon";
 import { saveCombo } from "@/lib/combos";
 import { getMealFeedback, sumProducts } from "@/lib/nutrition";
 import {
@@ -142,7 +143,9 @@ export default function CartSection({ products }: Props) {
                     : "border-gray-100 bg-white"
                 }`}
               >
-                <span className="text-xl">{p.emoji}</span>
+                <span className="text-xl">
+                  <Icon icon={p.emoji} />
+                </span>
                 <span className="flex-1 text-sm font-bold text-gray-800">
                   {p.name}
                 </span>

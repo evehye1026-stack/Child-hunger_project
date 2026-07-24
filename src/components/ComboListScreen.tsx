@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
+import Icon from "@/components/Icon";
 import {
   deleteCombo,
   getMyCombos,
@@ -181,7 +182,7 @@ export default function ComboListScreen() {
                               className="flex items-center gap-1 text-base font-bold text-gray-800"
                             >
                               <span className="text-xl">
-                                {c.productEmojis[i]}
+                                <Icon icon={c.productEmojis[i]} />
                               </span>
                               {name}
                             </span>
