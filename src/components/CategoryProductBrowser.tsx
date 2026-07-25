@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import Icon from "@/components/Icon";
 import { bestPickId, getTodaysPickId } from "@/lib/nutrition";
 import {
@@ -86,21 +86,23 @@ export default function CategoryProductBrowser({ products }: Props) {
       />
 
       {!searching && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex flex-wrap gap-2">
           {tabs.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              className={`flex h-16 w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-center shadow-sm transition active:scale-95 ${
-                tab === t ? "bg-c-green text-white" : "bg-white text-gray-700"
-              }`}
-            >
-              <span className="text-xl">
-                {t === ALL_TAB ? "🍽️" : MAJOR_CATEGORY_EMOJI[t]}
-              </span>
-              <span className="text-xs font-bold leading-tight">{t}</span>
-            </button>
+            <Fragment key={t}>
+              {t === "국물요리" && <div className="basis-full" />}
+              <button
+                type="button"
+                onClick={() => setTab(t)}
+                className={`flex h-16 w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-center shadow-sm transition active:scale-95 ${
+                  tab === t ? "bg-c-green text-white" : "bg-white text-gray-700"
+                }`}
+              >
+                <span className="text-xl">
+                  {t === ALL_TAB ? "🍽️" : MAJOR_CATEGORY_EMOJI[t]}
+                </span>
+                <span className="text-xs font-bold leading-tight">{t}</span>
+              </button>
+            </Fragment>
           ))}
           <button
             type="button"
