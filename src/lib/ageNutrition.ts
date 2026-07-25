@@ -68,9 +68,12 @@ export type SodiumEvaluation = {
 };
 
 // 같은 카테고리 안에서의 상대 순위(백분위) — 절대 기준과 비교하지 않음
+// product/categoryProducts는 Product 전체가 아니라 필요한 필드만 요구한다 —
+// 원본 식약처 DB(298,271건)에서 매칭된 상품은 category가 255개 쪽 Category
+// union이 아니라 식품중분류명(자유 문자열)이라 Product 타입을 그대로 못 쓴다.
 export function evaluateSodium(
-  product: Product,
-  categoryProducts: Product[]
+  product: { sodiumMg: number; category: string },
+  categoryProducts: { sodiumMg: number }[]
 ): SodiumEvaluation {
   const total = categoryProducts.length;
   const lowerCount = categoryProducts.filter(

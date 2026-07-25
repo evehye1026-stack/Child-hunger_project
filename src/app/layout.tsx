@@ -26,7 +26,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-dvh flex-col bg-neutral-200 font-sans sm:items-center sm:justify-center sm:py-8">
-        <div className="flex w-full flex-1 flex-col bg-cream sm:h-[880px] sm:max-h-[92dvh] sm:w-[430px] sm:flex-none sm:overflow-y-auto sm:rounded-[2.5rem] sm:shadow-2xl sm:ring-1 sm:ring-black/10">
+        <div className="relative flex w-full flex-1 flex-col bg-cream sm:h-[880px] sm:max-h-[92dvh] sm:w-[430px] sm:flex-none sm:overflow-y-auto sm:rounded-[2.5rem] sm:shadow-2xl sm:ring-1 sm:ring-black/10">
           {children}
         </div>
       </body>

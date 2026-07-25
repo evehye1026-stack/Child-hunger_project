@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# generated sqlite db (built from a 298k-row external CSV, too large to commit)
+/data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
