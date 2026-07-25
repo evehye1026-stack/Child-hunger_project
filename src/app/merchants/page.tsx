@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MerchantView from "@/components/MerchantView";
+import WindowScrollRestoration from "@/components/WindowScrollRestoration";
 import { getMerchantData } from "@/lib/merchants";
 
 export default function MerchantsPage() {
@@ -7,6 +8,7 @@ export default function MerchantsPage() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-cream sm:min-h-full">
+      <WindowScrollRestoration />
       <header className="flex items-center gap-3 p-4">
         <Link
           href="/"

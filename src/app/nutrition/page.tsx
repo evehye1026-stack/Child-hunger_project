@@ -3,6 +3,7 @@ import BottomTabBar from "@/components/BottomTabBar";
 import CartIconLink from "@/components/CartIconLink";
 import CategoryProductBrowser from "@/components/CategoryProductBrowser";
 import ChatWidget from "@/components/ChatWidget";
+import ScrollRestoreMain from "@/components/ScrollRestoreMain";
 import { getConvenienceProducts } from "@/lib/products";
 
 export default function NutritionPage() {
@@ -29,9 +30,9 @@ export default function NutritionPage() {
         <CartIconLink />
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 pb-4">
+      <ScrollRestoreMain className="flex-1 overflow-y-auto px-4 pb-4">
         <CategoryProductBrowser products={products} />
-      </main>
+      </ScrollRestoreMain>
 
       <ChatWidget />
       <BottomTabBar />

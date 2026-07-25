@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import BackButton from "@/components/BackButton";
+import BareBackButton from "@/components/BareBackButton";
 import { getStoreById } from "@/lib/mockData";
 
 type Props = {
@@ -20,7 +20,7 @@ export default async function StorePage({ params }: Props) {
   return (
     <div className="flex min-h-dvh flex-col bg-cream sm:min-h-full">
       <header className="flex items-center gap-3 p-4">
-        <BackButton />
+        <BareBackButton />
         <h1 className="truncate text-xl font-bold text-gray-800">{store.name}</h1>
       </header>
 
