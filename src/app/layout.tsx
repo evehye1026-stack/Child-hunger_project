@@ -19,6 +19,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
+  // 키보드가 뜰 때 레이아웃(dvh) 자체를 줄이지 않고 그 위에 얹히게 한다 — 그렇지 않으면
+  // 하단 탭바처럼 화면 전역에 고정된 UI까지 키보드 위로 같이 밀려 올라온다. 대신 채팅
+  // 패널은 ChatWidget에서 visualViewport 크기를 직접 재서 키보드 바로 위로 맞춘다.
+  interactiveWidget: "overlays-content",
   themeColor: "#fdf8ef",
 };
 
