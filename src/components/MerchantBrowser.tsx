@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Merchant } from "@/lib/merchants";
 
@@ -76,15 +77,18 @@ export default function MerchantBrowser({ restaurants, convenience }: Props) {
 
       <ul className="flex flex-col gap-3">
         {visible.map((m) => (
-          <li
-            key={m.id}
-            className="rounded-2xl border border-gray-100 bg-white p-3"
-          >
-            <p className="text-lg font-bold text-gray-800">{m.name}</p>
-            <p className="text-base text-gray-500">{m.address}</p>
-            {m.phone && (
-              <p className="text-sm text-gray-400">{m.phone}</p>
-            )}
+          <li key={m.id}>
+            <Link
+              href={`/merchants/${m.id}`}
+              className="flex items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-3 transition active:scale-[0.98]"
+            >
+              <span>
+                <p className="text-lg font-bold text-gray-800">{m.name}</p>
+                <p className="text-base text-gray-500">{m.address}</p>
+                {m.phone && <p className="text-sm text-gray-400">{m.phone}</p>}
+              </span>
+              <span className="shrink-0 text-xl text-gray-300">→</span>
+            </Link>
           </li>
         ))}
         {visible.length === 0 && (

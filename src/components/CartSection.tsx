@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import Icon from "@/components/Icon";
 import { saveCombo } from "@/lib/combos";
@@ -10,8 +9,8 @@ import {
   getProductsByMajorCategory,
   MAJOR_CATEGORY_EMOJI,
 } from "@/lib/productHelpers";
-import { supabase } from "@/lib/supabase";
 import { useCart } from "@/lib/useCart";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 import type { MajorCategory, Product } from "@/lib/types";
 
 type Tab = MajorCategory | "전체";
@@ -23,7 +22,7 @@ type Props = {
 };
 
 export default function CartSection({ products }: Props) {
-  const router = useRouter();
+  const ready = useRequireAuth();
   const { cartIds, removeFromCart, removeMany } = useCart();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -64,12 +63,6 @@ export default function CartSection({ products }: Props) {
     if (selectedProducts.length === 0 || !feedback) return;
 
     setError(null);
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
-      router.push("/login");
-      return;
-    }
-
     setSaving(true);
     const { error: saveError } = await saveCombo(
       selectedProducts,
@@ -86,6 +79,14 @@ export default function CartSection({ products }: Props) {
     removeMany(selectedIds);
     setSelectedIds([]);
     setSaved(true);
+  }
+
+  if (!ready) {
+    return (
+      <section className="flex flex-col items-center gap-2 rounded-2xl bg-white p-6 text-center shadow-sm">
+        <p className="text-base font-bold text-gray-400">불러오는 중...</p>
+      </section>
+    );
   }
 
   if (cartProducts.length === 0) {
@@ -111,20 +112,20 @@ export default function CartSection({ products }: Props) {
         <span className="text-sm text-gray-400">{cartProducts.length}개</span>
       </div>
 
-      <div className="grid grid-cols-5 gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         {tabs.map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`flex h-14 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-center shadow-sm transition active:scale-95 ${
+            className={`flex h-14 w-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-center shadow-sm transition active:scale-95 ${
               tab === t ? "bg-c-green text-white" : "bg-white text-gray-700"
             }`}
           >
             <span className="text-lg">
               {t === ALL_TAB ? "🍽️" : MAJOR_CATEGORY_EMOJI[t]}
             </span>
-            <span className="text-[10px] font-bold leading-tight">{t}</span>
+            <span className="text-xs font-bold leading-tight">{t}</span>
           </button>
         ))}
       </div>
@@ -146,7 +147,7 @@ export default function CartSection({ products }: Props) {
                 <span className="text-xl">
                   <Icon icon={p.emoji} />
                 </span>
-                <span className="flex-1 text-sm font-bold text-gray-800">
+                <span className="flex-1 text-base font-bold text-gray-800">
                   {p.name}
                 </span>
                 <span
@@ -163,7 +164,7 @@ export default function CartSection({ products }: Props) {
                 type="button"
                 onClick={() => removeFromCart(p.id)}
                 aria-label="장바구니에서 제거"
-                className="shrink-0 text-lg text-gray-300"
+                className="flex h-11 w-11 shrink-0 items-center justify-center text-lg text-gray-300"
               >
                 ✕
               </button>

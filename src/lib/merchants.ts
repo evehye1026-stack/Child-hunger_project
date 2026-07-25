@@ -91,3 +91,17 @@ export function getMerchantData(): MerchantData {
   cache = { restaurants, convenience };
   return cache;
 }
+
+export function getMerchantById(
+  id: string
+): { merchant: Merchant; type: "restaurant" | "convenience" } | undefined {
+  const { restaurants, convenience } = getMerchantData();
+
+  const restaurant = restaurants.find((m) => m.id === id);
+  if (restaurant) return { merchant: restaurant, type: "restaurant" };
+
+  const conv = convenience.find((m) => m.id === id);
+  if (conv) return { merchant: conv, type: "convenience" };
+
+  return undefined;
+}

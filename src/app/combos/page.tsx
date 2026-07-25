@@ -1,5 +1,7 @@
 import ComboListScreen from "@/components/ComboListScreen";
+import { getConvenienceProducts } from "@/lib/products";
 
 export default function CombosPage() {
-  return <ComboListScreen />;
+  const products = getConvenienceProducts();
+  return <ComboListScreen products={products} />;
 }

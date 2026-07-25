@@ -10,7 +10,9 @@ import {
   updateCombo,
   type SavedCombo,
 } from "@/lib/combos";
+import { getProductById } from "@/lib/productHelpers";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import type { Product } from "@/lib/types";
 
 type Filter = "all" | "liked";
 
@@ -43,7 +45,17 @@ function groupByDay(combos: SavedCombo[]): DayGroup[] {
   return groups;
 }
 
-export default function ComboListScreen() {
+// 저장 당시 아이콘을 그대로 굳혀두지 않고, 편의점 영양 조회의 최신 아이콘 로직을
+// 매번 다시 반영한다 — 아이콘 규칙이 바뀌면 예전 기록도 최신 모습으로 보이게.
+function resolveEmoji(products: Product[], productId: string, fallback: string): string {
+  return getProductById(products, productId)?.emoji ?? fallback;
+}
+
+type Props = {
+  products: Product[];
+};
+
+export default function ComboListScreen({ products }: Props) {
   const ready = useRequireAuth();
   const [combos, setCombos] = useState<SavedCombo[] | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
@@ -107,7 +119,7 @@ export default function ComboListScreen() {
   return (
     <div className="flex h-dvh flex-col bg-cream sm:h-full">
       <header className="flex items-center justify-between gap-3 p-4">
-        <div>
+        <div className="ml-6">
           <h1 className="text-xl font-bold text-gray-800">나의 식사 일기</h1>
           <p className="text-base text-gray-400">
             며칠에 무엇을 먹었는지 기록해봐요
@@ -173,27 +185,21 @@ export default function ComboListScreen() {
                       key={c.id}
                       className="rounded-2xl bg-white p-4 shadow-sm"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          {c.liked && <span className="text-lg">🩷</span>}
-                          {c.productNames.map((name, i) => (
-                            <span
-                              key={i}
-                              className="flex items-center gap-1 text-base font-bold text-gray-800"
-                            >
-                              <span className="text-xl">
-                                <Icon icon={c.productEmojis[i]} />
-                              </span>
-                              {name}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="flex shrink-0 items-center gap-3">
+                      {/* 카드 전체에 적용되는 정보(시간/수정/삭제)를 맨 위에 분리해서
+                          "첫 번째 음식에만 딸린 버튼"처럼 보이지 않게 한다 */}
+                      <div className="mb-3 flex items-center justify-between border-b border-gray-100 pb-2">
+                        <span className="text-xs font-bold text-gray-300">
+                          {new Date(c.createdAt).toLocaleTimeString("ko-KR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                        <div className="flex shrink-0 items-center gap-1">
                           <button
                             type="button"
                             onClick={() => startEdit(c)}
                             aria-label="수정"
-                            className="text-sm font-bold text-gray-400"
+                            className="flex h-11 items-center px-2 text-sm font-bold text-gray-400"
                           >
                             수정
                           </button>
@@ -201,18 +207,51 @@ export default function ComboListScreen() {
                             type="button"
                             onClick={() => handleDelete(c.id)}
                             aria-label="삭제"
-                            className="text-lg text-gray-300"
+                            className="flex h-11 w-11 items-center justify-center text-lg text-gray-300"
                           >
                             ✕
                           </button>
                         </div>
                       </div>
-                      <p className="mt-2 text-base font-bold text-c-green">
-                        {c.feedbackMessage}
-                      </p>
+
+                      {/* 가장 중요한 정보 — 무엇을 먹었는지. 여러 개면 얇은 구분선으로
+                          "한 끼에 같이 먹은 것들"임을 보여준다 */}
+                      <ul className="divide-y divide-gray-100">
+                        {c.productNames.map((name, i) => (
+                          <li
+                            key={i}
+                            className="flex items-center gap-2 py-2 first:pt-0 last:pb-0"
+                          >
+                            <span className="text-2xl">
+                              <Icon
+                                icon={resolveEmoji(
+                                  products,
+                                  c.productIds[i],
+                                  c.productEmojis[i]
+                                )}
+                              />
+                            </span>
+                            <span className="text-base font-bold text-gray-900">
+                              {name}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* 보조 정보 — 영양 피드백은 작은 배지로 축소 */}
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-c-green/10 px-3 py-1 text-xs font-bold text-c-green">
+                          {c.feedbackMessage}
+                        </span>
+                        {c.liked && (
+                          <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-bold text-pink-500">
+                            다음에도 먹을래요 🩷
+                          </span>
+                        )}
+                      </div>
 
                       {editingId === c.id ? (
-                        <div className="mt-2 flex flex-col gap-2">
+                        <div className="mt-3 flex flex-col gap-2">
                           <input
                             type="text"
                             value={editComment}
@@ -251,18 +290,15 @@ export default function ComboListScreen() {
                         </div>
                       ) : (
                         c.comment && (
-                          <p className="mt-1 text-sm text-gray-400">
+                          <p className="mt-2 text-xs text-gray-300">
                             &ldquo;{c.comment}&rdquo;
                           </p>
                         )
                       )}
 
-                      <p className="mt-2 text-xs text-gray-300">
-                        {Math.round(c.energyKcal)} kcal ·{" "}
-                        {new Date(c.createdAt).toLocaleTimeString("ko-KR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                      {/* 부가 정보 — 맨 아래, 작고 옅게 */}
+                      <p className="mt-1 text-xs text-gray-300">
+                        {Math.round(c.energyKcal)} kcal
                       </p>
                     </li>
                   ))}

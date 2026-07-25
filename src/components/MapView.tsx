@@ -3,8 +3,9 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Link from "next/link";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { MY_LOCATION } from "@/lib/mockData";
+import { useEffect } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import type { LatLng } from "@/lib/useMyLocation";
 import type { Store } from "@/lib/types";
 
 function storeIcon(type: Store["type"]) {
@@ -26,14 +27,25 @@ const meIcon = L.divIcon({
   iconAnchor: [10, 10],
 });
 
+// 실제 위치를 나중에 받아오면(내 위치 버튼) 지도가 그쪽으로 다시 움직이게 한다 —
+// react-leaflet은 center prop을 최초 렌더에만 적용하고 이후 변경엔 반응하지 않는다.
+function RecenterMap({ lat, lng }: LatLng) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], map.getZoom());
+  }, [lat, lng, map]);
+  return null;
+}
+
 type Props = {
   stores: Store[];
+  myLocation: LatLng;
 };
 
-export default function MapView({ stores }: Props) {
+export default function MapView({ stores, myLocation }: Props) {
   return (
     <MapContainer
-      center={[MY_LOCATION.lat, MY_LOCATION.lng]}
+      center={[myLocation.lat, myLocation.lng]}
       zoom={14}
       scrollWheelZoom
       style={{ height: "100%", width: "100%" }}
@@ -42,7 +54,8 @@ export default function MapView({ stores }: Props) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[MY_LOCATION.lat, MY_LOCATION.lng]} icon={meIcon} />
+      <RecenterMap lat={myLocation.lat} lng={myLocation.lng} />
+      <Marker position={[myLocation.lat, myLocation.lng]} icon={meIcon} />
       {stores.map((store) => (
         <Marker
           key={store.id}

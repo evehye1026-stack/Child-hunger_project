@@ -42,7 +42,7 @@ export default function MerchantView({ restaurants, convenience }: Props) {
       {mode === "list" ? (
         <MerchantBrowser restaurants={restaurants} convenience={convenience} />
       ) : (
-        <div className="h-[70vh] overflow-hidden rounded-2xl border border-gray-100">
+        <div className="h-[min(60vh,480px)] overflow-hidden rounded-2xl border border-gray-100">
           <KakaoMerchantMap restaurants={restaurants} convenience={convenience} />
         </div>
       )}

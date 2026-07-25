@@ -221,7 +221,7 @@ export default function ChatWidget() {
 
   if (!open) {
     return (
-      <div className="absolute bottom-24 right-4 z-40 flex flex-col items-end gap-1">
+      <div className="absolute bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-40 flex flex-col items-end gap-1">
         <div className="rounded-2xl bg-white px-3 py-1.5 text-xs font-bold text-gray-600 shadow-sm">
           {caption}
         </div>
@@ -239,7 +239,7 @@ export default function ChatWidget() {
   }
 
   return (
-    <div className="absolute inset-x-4 bottom-24 top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:inset-x-6">
+    <div className="absolute inset-x-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:inset-x-6">
       <div className="flex shrink-0 items-center gap-2 border-b border-gray-100 bg-white p-3">
         <MascotAvatar mood={mood} />
         <span className="flex-1 text-base font-bold text-gray-800">든든이</span>
@@ -247,7 +247,7 @@ export default function ChatWidget() {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="닫기"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-xl text-gray-400 transition active:scale-95"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-xl text-gray-400 transition active:scale-95"
         >
           ✕
         </button>
