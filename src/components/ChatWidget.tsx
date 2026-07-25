@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon";
 import { useChildAge } from "@/lib/useChildAge";
+import { useKeyboardInset } from "@/lib/useKeyboardInset";
 import type { ChatReply, MatchedFood, Mood, MiniCard } from "@/lib/chatbot";
 
 const MOOD_IMAGES: Record<Mood, string> = {
@@ -104,12 +105,12 @@ const MAX_AGE = 19;
 // 바뀌고, 패널을 닫아도 방금 표정이 플로팅 버튼에 그대로 남아 다시 열어보도록 유도한다.
 export default function ChatWidget() {
   const { age, setAge } = useChildAge();
+  const keyboardInset = useKeyboardInset();
   const idRef = useRef(0);
   const nextId = () => ++idRef.current;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
-  const [keyboardInset, setKeyboardInset] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: 0, role: "bot", text: GREETING, mood: "default" },
   ]);
@@ -131,26 +132,6 @@ export default function ChatWidget() {
   function addMessage(msg: Omit<ChatMessage, "id">) {
     setMessages((prev) => [...prev, { ...msg, id: nextId() }]);
   }
-
-  // layout viewport(interactiveWidget: overlays-content)는 키보드가 떠도 줄어들지 않으므로,
-  // visualViewport로 실제 보이는 높이를 직접 재서 채팅 패널 하단을 키보드 바로 위로 붙인다.
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    function measure() {
-      const inset = window.innerHeight - vv!.height - vv!.offsetTop;
-      setKeyboardInset(Math.max(0, Math.round(inset)));
-    }
-
-    measure();
-    vv.addEventListener("resize", measure);
-    vv.addEventListener("scroll", measure);
-    return () => {
-      vv.removeEventListener("resize", measure);
-      vv.removeEventListener("scroll", measure);
-    };
-  }, []);
 
   // 메시지가 늘어나거나(로딩 표시 포함) 패널을 열 때마다, 그리고 키보드가 뜨고 닫힐 때마다
   // 대화창을 맨 아래로 내려서 항상 최신 대화 + 입력창이 보이게 한다(카카오톡과 동일한 동작).
@@ -284,7 +265,7 @@ export default function ChatWidget() {
         </button>
       </div>
 
-      <div ref={scrollRef} className="flex flex-1 flex-col gap-3 overflow-y-auto p-3">
+      <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
         {messages.map((m) => (
           <ChatBubble key={m.id} message={m} />
         ))}

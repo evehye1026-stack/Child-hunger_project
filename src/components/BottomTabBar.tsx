@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useKeyboardInset } from "@/lib/useKeyboardInset";
 
 const TABS = [
   { href: "/", label: "홈", emoji: "🏠" },
@@ -12,6 +13,13 @@ const TABS = [
 
 export default function BottomTabBar() {
   const pathname = usePathname();
+  const keyboardInset = useKeyboardInset();
+
+  // 모바일 키보드가 떠 있는 동안엔 렌더링을 하지 않는다 — interactive-widget 메타 태그를
+  // 지원하지 않는 브라우저(예: iOS Safari)에서는 키보드가 뜰 때 dvh 기반 레이아웃 자체가
+  // 줄어들어 이 탭바가 키보드 바로 위로 같이 밀려 올라오는데, visualViewport로 키보드가
+  // 실제로 떠 있는지 직접 감지해 그 순간만 숨기면 브라우저 지원 여부와 무관하게 막을 수 있다.
+  if (keyboardInset > 0) return null;
 
   return (
     <nav className="flex shrink-0 border-t border-gray-100 bg-white pb-[env(safe-area-inset-bottom)]">
