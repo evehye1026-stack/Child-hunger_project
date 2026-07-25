@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import Icon from "@/components/Icon";
 import {
   evaluateCarb,
   evaluateProtein,
@@ -102,7 +103,7 @@ export default function AgeNutritionEvaluation({
                 className="flex items-center gap-2 rounded-2xl border border-gray-100 p-3 transition active:scale-[0.98]"
               >
                 <span className="text-2xl">
-                  {protein.recommendation.emoji}
+                  <Icon icon={protein.recommendation.emoji} />
                 </span>
                 <span className="flex-1 text-sm font-bold text-gray-700">
                   {protein.recommendation.name}(으)로 채워볼까요?

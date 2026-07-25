@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { CATEGORY_EMOJI } from "./productHelpers";
+import { CATEGORY_EMOJI, getIngredientEmoji } from "./productHelpers";
 import type { Category, Product } from "./types";
 
 type CsvRow = {
@@ -34,13 +34,14 @@ export function getConvenienceProducts(): Product[] {
   const rows = loadCsvRows();
   cache = rows.map((row, index) => {
     const category = row["카테고리"].trim() as Category;
+    const name = row["상품명"].trim();
     return {
       id: `cv${index}`,
       storeType: "convenience",
       category,
-      name: row["상품명"].trim(),
+      name,
       manufacturer: row["제조사"]?.trim() ?? "",
-      emoji: CATEGORY_EMOJI[category] ?? "🍴",
+      emoji: getIngredientEmoji(name, CATEGORY_EMOJI[category] ?? "🍴"),
       energyKcal: Number(row["에너지(kcal)"]),
       carbG: Number(row["탄수화물(g)"]),
       proteinG: Number(row["단백질(g)"]),

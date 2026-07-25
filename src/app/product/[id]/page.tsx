@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/AddToCartButton";
 import AgeNutritionEvaluation from "@/components/AgeNutritionEvaluation";
 import BackButton from "@/components/BackButton";
+import Icon from "@/components/Icon";
 import NutrientPictogram from "@/components/NutrientPictogram";
 import { COMBO_ITEMS } from "@/lib/mockData";
 import {
@@ -45,7 +46,9 @@ export default async function ProductPage({ params }: Props) {
           {isTodaysPick && (
             <span className="absolute left-4 top-4 text-2xl">👍</span>
           )}
-          <span className="text-7xl">{product.emoji}</span>
+          <span className="text-7xl">
+            <Icon icon={product.emoji} />
+          </span>
           <span className="text-base font-bold text-gray-400">
             {product.category}
           </span>
@@ -92,7 +95,7 @@ export default async function ProductPage({ params }: Props) {
           {combo.showCombo && (
             <div className="flex flex-wrap items-center justify-center gap-3">
               <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-3xl">
-                {product.emoji}
+                <Icon icon={product.emoji} />
               </span>
               {COMBO_ITEMS.map((item, i) => (
                 <span key={item.id} className="flex items-center gap-3">

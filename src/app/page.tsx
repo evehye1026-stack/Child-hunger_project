@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
+import Icon from "@/components/Icon";
 import { distanceMeters, walkMinutes } from "@/lib/distance";
 import { MY_LOCATION, STORES } from "@/lib/mockData";
 import { getOverallTodaysPickId } from "@/lib/nutrition";
@@ -55,7 +56,7 @@ export default function Home() {
               className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition active:scale-[0.98]"
             >
               <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-4xl">
-                {pick.emoji}
+                <Icon icon={pick.emoji} />
               </span>
               <span className="flex-1">
                 <span className="block text-lg font-bold text-gray-800">

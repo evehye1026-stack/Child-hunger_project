@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import Icon from "@/components/Icon";
 import { saveCombo } from "@/lib/combos";
 import { getMealFeedback, sumProducts } from "@/lib/nutrition";
 import {
@@ -117,7 +118,8 @@ export default function LogMealScreen({ products }: Props) {
                   onClick={() => toggle(p.id)}
                   className="flex items-center gap-1 rounded-2xl bg-c-green px-3 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95"
                 >
-                  {p.emoji} {p.name} <span className="text-white/70">×</span>
+                  <Icon icon={p.emoji} /> {p.name}{" "}
+                  <span className="text-white/70">×</span>
                 </button>
               ))}
             </div>
@@ -170,7 +172,7 @@ export default function LogMealScreen({ products }: Props) {
                     }`}
                   >
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl">
-                      {p.emoji}
+                      <Icon icon={p.emoji} />
                     </span>
                     <span className="flex-1 text-base font-bold text-gray-800">
                       {p.name}
