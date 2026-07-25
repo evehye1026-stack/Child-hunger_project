@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
+import ChatWidget from "@/components/ChatWidget";
 import Icon from "@/components/Icon";
 import { distanceMeters, walkMinutes } from "@/lib/distance";
 import { MY_LOCATION, STORES } from "@/lib/mockData";
@@ -110,6 +111,7 @@ export default function Home() {
         </section>
       </main>
 
+      <ChatWidget />
       <BottomTabBar />
     </div>
   );

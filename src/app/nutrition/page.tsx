@@ -1,6 +1,7 @@
 import BottomTabBar from "@/components/BottomTabBar";
 import CartIconLink from "@/components/CartIconLink";
 import CategoryProductBrowser from "@/components/CategoryProductBrowser";
+import ChatWidget from "@/components/ChatWidget";
 import { getConvenienceProducts } from "@/lib/products";
 
 export default function NutritionPage() {
@@ -22,6 +23,7 @@ export default function NutritionPage() {
         <CategoryProductBrowser products={products} />
       </main>
 
+      <ChatWidget />
       <BottomTabBar />
     </div>
   );
