@@ -80,7 +80,11 @@ export default function KakaoMerchantMap({ restaurants, convenience }: Props) {
           });
 
           const infowindow = new kakao.maps.InfoWindow({
-            content: `<div style="padding:6px 10px;font-size:13px;font-weight:bold;white-space:nowrap;">${merchant.name}</div>`,
+            content: `
+              <div style="padding:8px 12px;font-size:13px;white-space:nowrap;">
+                <div style="font-weight:bold;margin-bottom:4px;">${merchant.name}</div>
+                <a href="/merchants/${merchant.id}" style="font-weight:bold;color:#2f6fed;text-decoration:none;">자세히 보기 →</a>
+              </div>`,
           });
           kakao.maps.event.addListener(marker, "click", () => {
             infowindow.open(map, marker);

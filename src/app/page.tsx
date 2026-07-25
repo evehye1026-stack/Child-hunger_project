@@ -20,15 +20,9 @@ export default function Home() {
   return (
     <div className="flex h-dvh flex-col bg-cream sm:h-full">
       <header className="p-4">
-        <p className="text-base font-bold text-gray-400">📍 강서구</p>
-        <h1 className="flex items-center gap-1 text-2xl font-bold text-gray-800">
+        <h1 className="ml-6 mt-2 flex items-center gap-2 text-2xl font-bold text-gray-800">
           오늘도 든든하게
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/deundeuni-default.png"
-            alt="든든이"
-            className="h-14 w-14 -translate-y-1 object-contain"
-          />
+          <span className="text-base font-bold text-gray-400">📍 강서구</span>
         </h1>
       </header>
 
@@ -54,7 +48,7 @@ export default function Home() {
         <section className="mt-4">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-500">가까운 매장</h2>
-            <Link href="/map" className="text-sm font-bold text-c-blue">
+            <Link href="/map" className="text-sm font-bold text-c-green">
               지도 보기 →
             </Link>
           </div>
@@ -65,7 +59,7 @@ export default function Home() {
                   href={`/store/${store.id}`}
                   className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 transition active:scale-[0.98]"
                 >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center text-2xl">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cream text-2xl">
                     {store.type === "restaurant" ? "🍽️" : "🏪"}
                   </span>
                   <span className="flex-1">
@@ -76,7 +70,7 @@ export default function Home() {
                       {store.address}
                     </span>
                   </span>
-                  <span className="text-lg font-bold text-c-blue">
+                  <span className="text-lg font-bold text-c-green">
                     {walkMinutes(meters)}분
                   </span>
                 </Link>
