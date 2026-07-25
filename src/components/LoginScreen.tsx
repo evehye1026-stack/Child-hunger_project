@@ -71,7 +71,12 @@ export default function LoginScreen() {
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-6 bg-cream p-6 sm:h-full">
       <div className="flex flex-col items-center gap-1">
-        <span className="text-5xl">🍙</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/deundeuni-default.png"
+          alt="든든이"
+          className="h-12 w-12 object-contain"
+        />
         <h1 className="text-2xl font-bold text-gray-800">우리동네 밥친구</h1>
         <p className="text-base text-gray-400">
           {mode === "signin" ? "로그인하고 시작해요" : "회원가입하고 시작해요"}
