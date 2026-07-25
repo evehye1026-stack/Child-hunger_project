@@ -27,11 +27,7 @@ export default async function StorePage({ params }: Props) {
       <main className="flex flex-1 flex-col gap-4 p-4">
         <section className="rounded-2xl bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center gap-3">
-            <span
-              className={`flex h-14 w-14 items-center justify-center rounded-full text-3xl text-white ${
-                isRestaurant ? "bg-c-green" : "bg-c-blue"
-              }`}
-            >
+            <span className="flex h-14 w-14 items-center justify-center text-3xl">
               {isRestaurant ? "🍽️" : "🏪"}
             </span>
             <div>

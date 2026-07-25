@@ -18,11 +18,11 @@ function markerImage(
   kakaoNs: typeof window.kakao,
   type: "restaurant" | "convenience"
 ) {
-  const bg = type === "restaurant" ? "#16A34A" : "#2563EB";
+  const borderColor = type === "restaurant" ? "#16A34A" : "#2563EB";
   const emoji = type === "restaurant" ? "🍽️" : "🏪";
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
-      <circle cx="20" cy="20" r="17" fill="${bg}" stroke="white" stroke-width="3" />
+      <circle cx="20" cy="20" r="17" fill="white" stroke="${borderColor}" stroke-width="3" />
       <text x="20" y="26" font-size="18" text-anchor="middle">${emoji}</text>
     </svg>`;
   return new kakaoNs.maps.MarkerImage(
