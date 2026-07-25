@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/AddToCartButton";
 import AgeNutritionEvaluation from "@/components/AgeNutritionEvaluation";
-import BackButton from "@/components/BackButton";
+import BareBackButton from "@/components/BareBackButton";
 import Icon from "@/components/Icon";
 import NutrientPictogram from "@/components/NutrientPictogram";
 import { COMBO_ITEMS } from "@/lib/mockData";
@@ -35,7 +35,7 @@ export default async function ProductPage({ params }: Props) {
   return (
     <div className="flex min-h-dvh flex-col bg-cream sm:min-h-full">
       <header className="flex items-center gap-3 p-4">
-        <BackButton />
+        <BareBackButton />
         <h1 className="truncate text-xl font-bold text-gray-800">
           {product.name}
         </h1>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon";
 import { useChildAge } from "@/lib/useChildAge";
 import type { ChatReply, MatchedFood, Mood, MiniCard } from "@/lib/chatbot";
@@ -106,8 +106,10 @@ export default function ChatWidget() {
   const { age, setAge } = useChildAge();
   const idRef = useRef(0);
   const nextId = () => ++idRef.current;
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: 0, role: "bot", text: GREETING, mood: "default" },
   ]);
@@ -129,6 +131,32 @@ export default function ChatWidget() {
   function addMessage(msg: Omit<ChatMessage, "id">) {
     setMessages((prev) => [...prev, { ...msg, id: nextId() }]);
   }
+
+  // layout viewport(interactiveWidget: overlays-content)는 키보드가 떠도 줄어들지 않으므로,
+  // visualViewport로 실제 보이는 높이를 직접 재서 채팅 패널 하단을 키보드 바로 위로 붙인다.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    function measure() {
+      const inset = window.innerHeight - vv!.height - vv!.offsetTop;
+      setKeyboardInset(Math.max(0, Math.round(inset)));
+    }
+
+    measure();
+    vv.addEventListener("resize", measure);
+    vv.addEventListener("scroll", measure);
+    return () => {
+      vv.removeEventListener("resize", measure);
+      vv.removeEventListener("scroll", measure);
+    };
+  }, []);
+
+  // 메시지가 늘어나거나(로딩 표시 포함) 패널을 열 때마다, 그리고 키보드가 뜨고 닫힐 때마다
+  // 대화창을 맨 아래로 내려서 항상 최신 대화 + 입력창이 보이게 한다(카카오톡과 동일한 동작).
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, loading, open, keyboardInset]);
 
   async function askBot(message: string, currentAge: number) {
     setLoading(true);
@@ -239,7 +267,10 @@ export default function ChatWidget() {
   }
 
   return (
-    <div className="absolute inset-x-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:inset-x-6">
+    <div
+      className="absolute inset-x-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:inset-x-6"
+      style={keyboardInset > 0 ? { bottom: keyboardInset } : undefined}
+    >
       <div className="flex shrink-0 items-center gap-2 border-b border-gray-100 bg-white p-3">
         <MascotAvatar mood={mood} />
         <span className="flex-1 text-base font-bold text-gray-800">든든이</span>
@@ -253,7 +284,7 @@ export default function ChatWidget() {
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-3">
+      <div ref={scrollRef} className="flex flex-1 flex-col gap-3 overflow-y-auto p-3">
         {messages.map((m) => (
           <ChatBubble key={m.id} message={m} />
         ))}
@@ -278,7 +309,7 @@ export default function ChatWidget() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="예: 참치김밥 먹으려고"
-          className="h-12 flex-1 rounded-2xl border border-gray-100 bg-cream px-4 text-base font-bold text-gray-700 outline-none placeholder:text-gray-300"
+          className="h-12 min-w-0 flex-1 rounded-2xl border border-gray-100 bg-cream px-4 text-base font-bold text-gray-700 outline-none placeholder:text-gray-300"
         />
         <button
           type="submit"

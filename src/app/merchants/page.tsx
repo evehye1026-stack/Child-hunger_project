@@ -1,4 +1,4 @@
-import BackButton from "@/components/BackButton";
+import Link from "next/link";
 import MerchantView from "@/components/MerchantView";
 import { getMerchantData } from "@/lib/merchants";
 
@@ -8,7 +8,13 @@ export default function MerchantsPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-cream sm:min-h-full">
       <header className="flex items-center gap-3 p-4">
-        <BackButton />
+        <Link
+          href="/"
+          aria-label="홈으로 이동"
+          className="flex h-14 w-14 shrink-0 items-center justify-center text-2xl font-bold transition active:scale-95"
+        >
+          ←
+        </Link>
         <div>
           <h1 className="text-xl font-bold text-gray-800">가맹점 데이터</h1>
           <p className="text-sm text-gray-400">

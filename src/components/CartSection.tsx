@@ -17,6 +17,27 @@ type Tab = MajorCategory | "전체";
 
 const ALL_TAB = "전체" as const;
 
+// 좁은 화면에서 탭 라벨이 브라우저 마음대로 이상한 자리에서 줄바꿈되는 걸 막고,
+// 지정된 위치에서만 줄바꿈되게 한다.
+const TAB_LABEL_BREAKS: Partial<Record<Tab, [string, string]>> = {
+  "빵·샌드위치": ["빵·샌드", "위치"],
+  단백질간식: ["단백질", "간식"],
+  "유제품·음료": ["유제품·", "음료"],
+};
+
+function renderTabLabel(t: Tab) {
+  const parts = TAB_LABEL_BREAKS[t];
+  if (!parts) return t;
+  const [before, after] = parts;
+  return (
+    <>
+      {before}
+      <br />
+      {after}
+    </>
+  );
+}
+
 type Props = {
   products: Product[];
 };
@@ -125,7 +146,7 @@ export default function CartSection({ products }: Props) {
             <span className="text-lg">
               {t === ALL_TAB ? "🍽️" : MAJOR_CATEGORY_EMOJI[t]}
             </span>
-            <span className="text-xs font-bold leading-tight">{t}</span>
+            <span className="text-xs font-bold leading-tight">{renderTabLabel(t)}</span>
           </button>
         ))}
       </div>
