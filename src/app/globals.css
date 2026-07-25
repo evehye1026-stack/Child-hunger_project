@@ -23,6 +23,23 @@
   --color-c-green: var(--c-green);
   --color-cream: var(--cream);
   --font-sans: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  --animate-float: float 2.6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float {
+    animation: none;
+  }
 }
 
 body {

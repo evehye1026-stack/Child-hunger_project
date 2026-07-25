@@ -70,11 +70,7 @@ export default function MapScreen() {
                 href={`/store/${store.id}`}
                 className="flex items-center gap-3 rounded-2xl border border-gray-100 p-3 transition active:scale-[0.98]"
               >
-                <span
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl text-white ${
-                    store.type === "restaurant" ? "bg-c-green" : "bg-c-blue"
-                  }`}
-                >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center text-2xl">
                   {store.type === "restaurant" ? "🍽️" : "🏪"}
                 </span>
                 <span className="flex-1">

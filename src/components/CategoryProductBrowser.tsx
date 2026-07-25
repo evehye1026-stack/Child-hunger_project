@@ -79,6 +79,13 @@ export default function CategoryProductBrowser({ products }: Props) {
               <span className="text-[11px] font-bold leading-tight">{t}</span>
             </button>
           ))}
+          <Link
+            href="/recommend"
+            className="flex h-16 flex-col items-center justify-center gap-0.5 rounded-2xl bg-white px-1 text-center text-gray-700 shadow-sm transition active:scale-95"
+          >
+            <span className="text-xl">⭐</span>
+            <span className="text-[11px] font-bold leading-tight">음식 추천</span>
+          </Link>
         </div>
       )}
 

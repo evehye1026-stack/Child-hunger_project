@@ -37,12 +37,18 @@ export type MiniCard = {
   sodiumMg: number;
 };
 
+// 마스코트(든든이) 표정 — 챗봇 응답의 성격에 따라 결정한다.
+// worried: 방금 확인한 음식이 단백질 부족/나트륨 과다였을 때 (플로팅 버튼도 이 표정으로 바뀜)
+// excited: 좋은 조합이었을 때, curious: 나이를 묻거나 매칭에 실패했을 때, default: 그 외
+export type Mood = "default" | "curious" | "worried" | "excited";
+
 export type ChatReply = {
   matched: boolean;
   reply: string;
   card: MiniCard | null;
   recommendationCard: MiniCard | null;
   alternatives: MatchedFood[];
+  mood: Mood;
 };
 
 function fromProduct(p: Product): MatchedFood {
@@ -85,10 +91,10 @@ function toMiniCard(food: MatchedFood): MiniCard {
   };
 }
 
-// "참치김밥 먹으려고" / "라면 먹을 건데 뭐 먹지" / "치즈스틱 어때?" 같은 흔한 말투에서
-// 뒤에 붙는 어미를 잘라내고 음식 이름만 남긴다.
+// "참치김밥 먹으려고" / "라면 먹을 건데 뭐 먹지" / "치즈스틱 어때?" / "제육 먹고 싶어" 같은
+// 흔한 말투에서 뒤에 붙는 어미를 잘라내고 음식 이름만 남긴다.
 const TRAILING_FILLER = new RegExp(
-  "(먹으려고|먹을려고|먹을\\s*건데|먹을까요?|먹을래요?|뭐\\s*먹지|뭐\\s*먹을까|살까요?|살\\s*건데|좋을까요?|괜찮을까요?|어때요?|줄까요?)[\\s\\S]*$"
+  "(먹고\\s*싶|먹고파|먹으려고|먹을려고|먹을\\s*건데|먹을까요?|먹을래요?|뭐\\s*먹지|뭐\\s*먹을까|살까요?|살\\s*건데|좋을까요?|괜찮을까요?|어때요?|줄까요?)[\\s\\S]*$"
 );
 
 export function extractFoodQuery(message: string): string {
@@ -168,10 +174,27 @@ export function buildChatReply(message: string, age: number): ChatReply {
       card: null,
       recommendationCard: null,
       alternatives: result.suggestions,
+      mood: "curious",
     };
   }
 
   const { food, alternatives } = result;
+
+  // "불고기"/"제육"처럼 특정 상품명이 아니라 재료·키워드로 물어봐서 여러 개가 매칭되면,
+  // 대표 1개를 멋대로 골라 평가하지 않고 그 재료가 들어간 음식들을 먼저 보여주고 고르게 한다.
+  // (하나로 좁혀지는 경우, 예: "버섯소불고기도시락 먹고 싶다"는 바로 아래 평가로 진행된다.)
+  if (alternatives.length > 0) {
+    const query = extractFoodQuery(message);
+    return {
+      matched: true,
+      reply: `'${query}'(이)가 들어간 음식이 여러 개 있어요! 어떤 걸로 먹을지 말해줄래요?`,
+      card: null,
+      recommendationCard: null,
+      alternatives: [food, ...alternatives],
+      mood: "curious",
+    };
+  }
+
   const curatedProducts = getConvenienceProducts();
 
   // evaluateProtein/evaluateCarb는 product.proteinG · .carbG · .energyKcal만 읽으므로
@@ -185,17 +208,22 @@ export function buildChatReply(message: string, age: number): ChatReply {
   const carb = evaluateCarb(food as unknown as Product);
 
   let reply: string;
+  let mood: Mood;
   let recommendationCard: MiniCard | null = null;
 
   if (!protein.sufficient && protein.recommendation) {
     reply = `${food.name}은(는) 좋은데 단백질이 조금 부족해요. ${protein.recommendation.name} 같이 드셔보세요`;
     recommendationCard = toMiniCard(fromProduct(protein.recommendation));
+    mood = "worried";
   } else if (sodium.percentile >= SODIUM_HIGH_PERCENTILE) {
     reply = `${food.category} 중에서는 좀 짠 편이에요. 물도 챙겨 드세요`;
+    mood = "worried";
   } else if (carb.ratioPercent >= CARB_BALANCED_MIN && carb.ratioPercent <= CARB_BALANCED_MAX) {
     reply = carb.message;
+    mood = "excited";
   } else {
     reply = "이 조합 좋아요!";
+    mood = "excited";
   }
 
   return {
@@ -204,5 +232,6 @@ export function buildChatReply(message: string, age: number): ChatReply {
     card: toMiniCard(food),
     recommendationCard,
     alternatives,
+    mood,
   };
 }

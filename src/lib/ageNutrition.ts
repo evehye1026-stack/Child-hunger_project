@@ -1,4 +1,8 @@
-import type { Product } from "./types";
+import type { Category, Product } from "./types";
+
+// 곁들여 먹기 좋은 단백질 보충 카테고리로만 추천 후보를 제한한다 — 삼각김밥/도시락/면류 같은
+// 한 끼 식사류를 "곁들일 메뉴"로 추천하면 어색하므로 제외.
+const RECOMMENDATION_CATEGORIES: Category[] = ["닭가슴살", "계란", "두부", "그릭요거트"];
 
 // 2015 한국인 영양소 섭취기준(보건복지부·한국영양학회) 남녀 평균, 하루치의 1/3(한 끼)
 const PROTEIN_TARGETS: Array<{ maxAge: number; targetG: number }> = [
@@ -24,6 +28,21 @@ function supplementScore(p: Product): number {
   return p.proteinG - p.sodiumMg / 300;
 }
 
+// 카테고리별 최고점 하나씩만 뽑아 그중에서 무작위로 고른다. supplementScore를 전체
+// 후보에서 그냥 top5 뽑으면 단백질 절대량이 높은 닭가슴살류가 항상 이겨서 두부/그릭요거트
+// 같은 카테고리는 사실상 추천에 뽑힐 일이 없다 — 카테고리마다 기회를 준다.
+function pickDiverseRecommendation(candidates: Product[]): Product {
+  const bestByCategory = new Map<string, Product>();
+  for (const p of candidates) {
+    const current = bestByCategory.get(p.category);
+    if (!current || supplementScore(p) > supplementScore(current)) {
+      bestByCategory.set(p.category, p);
+    }
+  }
+  const pool = [...bestByCategory.values()];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 export type ProteinEvaluation = {
   targetG: number;
   deficitG: number;
@@ -44,8 +63,8 @@ export function evaluateProtein(
     return { targetG, deficitG: 0, sufficient, recommendation: null };
   }
 
-  // 주의: 추천 후보를 특정 카테고리로 제한하지 말 것 — 전체 상품에서 나트륨 기준으로만 거른다
   const candidates = allProducts
+    .filter((p) => RECOMMENDATION_CATEGORIES.includes(p.category))
     .filter((p) => p.sodiumMg <= SODIUM_LIMIT_MG)
     .filter((p) => !isLikelyImported(p.manufacturer));
 
@@ -53,11 +72,7 @@ export function evaluateProtein(
     return { targetG, deficitG, sufficient, recommendation: null };
   }
 
-  const ranked = [...candidates].sort(
-    (a, b) => supplementScore(b) - supplementScore(a)
-  );
-  const top5 = ranked.slice(0, 5);
-  const pick = top5[Math.floor(Math.random() * top5.length)];
+  const pick = pickDiverseRecommendation(candidates);
 
   return { targetG, deficitG, sufficient, recommendation: pick };
 }

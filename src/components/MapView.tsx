@@ -8,11 +8,11 @@ import { MY_LOCATION } from "@/lib/mockData";
 import type { Store } from "@/lib/types";
 
 function storeIcon(type: Store["type"]) {
-  const bg = type === "restaurant" ? "#16A34A" : "#2563EB";
+  const borderColor = type === "restaurant" ? "#16A34A" : "#2563EB";
   const emoji = type === "restaurant" ? "🍽️" : "🏪";
   return L.divIcon({
     className: "",
-    html: `<div style="width:40px;height:40px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:20px;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${emoji}</div>`,
+    html: `<div style="width:40px;height:40px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:20px;border:3px solid ${borderColor};box-shadow:0 2px 6px rgba(0,0,0,0.3);">${emoji}</div>`,
     iconSize: [40, 40],
     iconAnchor: [20, 40],
     popupAnchor: [0, -38],
