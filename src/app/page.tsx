@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import AgeSettingCard from "@/components/AgeSettingCard";
 import BottomTabBar from "@/components/BottomTabBar";
 import ChatWidget from "@/components/ChatWidget";
 import { distanceMeters, walkMinutes } from "@/lib/distance";
 import { MY_LOCATION, STORES } from "@/lib/mockData";
+import { useMyLocation } from "@/lib/useMyLocation";
 
 const FEATURES = [
   { href: "/map", emoji: "🗺️", title: "동네지도", desc: "식당·편의점" },
@@ -12,8 +15,11 @@ const FEATURES = [
 ];
 
 export default function Home() {
+  const { location, hasRealLocation, status, error, requestLocation } =
+    useMyLocation(MY_LOCATION);
+
   const nearby = STORES.filter((s) => !s.closed)
-    .map((store) => ({ store, meters: distanceMeters(MY_LOCATION, store) }))
+    .map((store) => ({ store, meters: distanceMeters(location, store) }))
     .sort((a, b) => a.meters - b.meters)
     .slice(0, 3);
 
@@ -22,8 +28,18 @@ export default function Home() {
       <header className="p-4">
         <h1 className="ml-6 mt-2 flex items-center gap-2 text-2xl font-bold text-gray-800">
           오늘도 든든하게
-          <span className="text-base font-bold text-gray-400">📍 강서구</span>
+          <button
+            type="button"
+            onClick={requestLocation}
+            disabled={status === "loading"}
+            className="text-base font-bold text-gray-400 transition active:scale-95 disabled:opacity-60"
+          >
+            📍 {status === "loading" ? "찾는 중..." : hasRealLocation ? "내 위치" : "강서구"}
+          </button>
         </h1>
+        {error && (
+          <p className="ml-6 mt-1 text-sm font-bold text-c-red">{error}</p>
+        )}
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 pb-4">
@@ -47,7 +63,9 @@ export default function Home() {
 
         <section className="mt-4">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-gray-500">가까운 매장</h2>
+            <h2 className="text-lg font-bold text-gray-500">
+              가까운 매장{hasRealLocation ? " · 내 위치 기준" : ""}
+            </h2>
             <Link href="/map" className="text-sm font-bold text-c-green">
               지도 보기 →
             </Link>

@@ -19,7 +19,7 @@ export default function CartPage() {
         <div>
           <h1 className="text-xl font-bold text-gray-800">장바구니</h1>
           <p className="text-base text-gray-400">
-            담은 음식을 확인하고 식단일지에 추가해요
+            담은 음식을 확인하고 식단일기에 추가해요
           </p>
         </div>
       </header>

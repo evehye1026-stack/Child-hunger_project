@@ -115,7 +115,7 @@ export default function CartSection({ products }: Props) {
       <section className="flex flex-col items-center gap-2 rounded-2xl bg-white p-6 text-center shadow-sm">
         <span className="text-4xl">{saved ? "📔" : "🛒"}</span>
         <p className="text-base font-bold text-gray-400">
-          {saved ? "식단일지에 추가했어요!" : "장바구니가 비어있어요"}
+          {saved ? "식단일기에 추가했어요!" : "장바구니가 비어있어요"}
         </p>
         <p className="text-sm text-gray-300">
           {saved
@@ -217,7 +217,7 @@ export default function CartSection({ products }: Props) {
       )}
       {saved && (
         <p className="text-center text-sm font-bold text-c-green">
-          식단일지에 추가했어요! 📔
+          식단일기에 추가했어요! 📔
         </p>
       )}
 
@@ -231,7 +231,7 @@ export default function CartSection({ products }: Props) {
           ? "상품을 선택해주세요"
           : saving
             ? "추가하는 중..."
-            : `선택한 ${selectedIds.length}개 식단일지에 추가`}
+            : `선택한 ${selectedIds.length}개 식단일기에 추가`}
       </button>
     </section>
   );
