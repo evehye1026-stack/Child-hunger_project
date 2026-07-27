@@ -4,7 +4,7 @@
 // 네트워크가 죽으면 그 URL의 캐시된 마지막 버전을 그대로 돌려준다.
 // v1 캐시엔 예전에 캐싱된 낡은 JS 청크가 남아있을 수 있어 이름을 올려서 폐기시킨다
 // (activate 핸들러가 이름이 다른 캐시는 전부 지운다).
-const CACHE_NAME = "deundeuni-v2";
+const CACHE_NAME = "deundeuni-v3";
 
 self.addEventListener("install", () => {
   self.skipWaiting();

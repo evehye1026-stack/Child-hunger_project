@@ -42,6 +42,12 @@ export type MiniCard = {
 // excited: 좋은 조합이었을 때, curious: 나이를 묻거나 매칭에 실패했을 때, default: 그 외
 export type Mood = "default" | "curious" | "worried" | "excited";
 
+export type DietLogSuggestion = {
+  primary: MatchedFood;
+  recommended: MatchedFood;
+  feedbackMessage: string;
+};
+
 export type ChatReply = {
   matched: boolean;
   reply: string;
@@ -49,6 +55,7 @@ export type ChatReply = {
   recommendationCard: MiniCard | null;
   alternatives: MatchedFood[];
   mood: Mood;
+  dietLogSuggestion: DietLogSuggestion | null;
 };
 
 function fromProduct(p: Product): MatchedFood {
@@ -97,6 +104,12 @@ const TRAILING_FILLER = new RegExp(
   "(먹고\\s*싶|먹고파|먹으려고|먹을려고|먹을\\s*건데|먹을까요?|먹을래요?|뭐\\s*먹지|뭐\\s*먹을까|살까요?|살\\s*건데|좋을까요?|괜찮을까요?|어때요?|줄까요?)[\\s\\S]*$"
 );
 
+// 상품명 비교 시 띄어쓰기 차이("치즈 스틱" vs "치즈스틱")로 매칭이 실패하지 않도록
+// 공백을 모두 제거하고 비교한다.
+function normalizeForMatch(name: string): string {
+  return name.replace(/\s+/g, "");
+}
+
 export function extractFoodQuery(message: string): string {
   const stripped = message.trim().replace(TRAILING_FILLER, "").trim();
   const cleaned = stripped.replace(/[?!.,~]+$/g, "").trim();
@@ -121,9 +134,13 @@ function guessMajorCategory(message: string): MajorCategory | null {
 }
 
 function findExactOrPartial(products: Product[], query: string): Product[] {
-  const exact = products.filter((p) => p.name === query);
+  const normalizedQuery = normalizeForMatch(query);
+  const exact = products.filter((p) => normalizeForMatch(p.name) === normalizedQuery);
   if (exact.length > 0) return exact;
-  return products.filter((p) => p.name.includes(query) || query.includes(p.name));
+  return products.filter((p) => {
+    const normalizedName = normalizeForMatch(p.name);
+    return normalizedName.includes(normalizedQuery) || normalizedQuery.includes(normalizedName);
+  });
 }
 
 function pickRepresentative<T extends { name: string }>(
@@ -175,6 +192,7 @@ export function buildChatReply(message: string, age: number): ChatReply {
       recommendationCard: null,
       alternatives: result.suggestions,
       mood: "curious",
+      dietLogSuggestion: null,
     };
   }
 
@@ -192,6 +210,7 @@ export function buildChatReply(message: string, age: number): ChatReply {
       recommendationCard: null,
       alternatives: [food, ...alternatives],
       mood: "curious",
+      dietLogSuggestion: null,
     };
   }
 
@@ -210,11 +229,15 @@ export function buildChatReply(message: string, age: number): ChatReply {
   let reply: string;
   let mood: Mood;
   let recommendationCard: MiniCard | null = null;
+  let dietLogSuggestion: DietLogSuggestion | null = null;
 
   if (!protein.sufficient && protein.recommendation) {
-    reply = `${food.name}은(는) 좋은데 단백질이 조금 부족해요. ${protein.recommendation.name} 같이 드셔보세요`;
-    recommendationCard = toMiniCard(fromProduct(protein.recommendation));
+    const recommended = fromProduct(protein.recommendation);
+    const feedbackMessage = `${food.name}은(는) 좋은데 단백질이 조금 부족해요. ${protein.recommendation.name} 같이 드셔보세요`;
+    reply = `${feedbackMessage}. 두 음식을 식단일기에 넣을까요?`;
+    recommendationCard = toMiniCard(recommended);
     mood = "worried";
+    dietLogSuggestion = { primary: food, recommended, feedbackMessage };
   } else if (sodium.percentile >= SODIUM_HIGH_PERCENTILE) {
     reply = `${food.category} 중에서는 좀 짠 편이에요. 물도 챙겨 드세요`;
     mood = "worried";
@@ -233,5 +256,6 @@ export function buildChatReply(message: string, age: number): ChatReply {
     recommendationCard,
     alternatives,
     mood,
+    dietLogSuggestion,
   };
 }

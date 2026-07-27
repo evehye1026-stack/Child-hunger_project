@@ -41,20 +41,21 @@ function rowToRawFood(row: SQLOutputRow): RawFood {
 }
 
 // 완전 일치 우선, 없으면 부분 문자열 포함(짧은 이름 = 더 대표적인 상품으로 간주해 앞으로)
+// 띄어쓰기 차이로 매칭이 실패하지 않도록 이름/검색어 양쪽 다 공백을 지우고 비교한다.
 export function searchRawFoods(query: string): RawFood[] {
   const database = getDb();
-  const q = query.trim();
+  const q = query.trim().replace(/\s+/g, "");
   if (!database || !q) return [];
 
   const exact = database
-    .prepare("SELECT * FROM raw_foods WHERE name = ? LIMIT ?")
+    .prepare("SELECT * FROM raw_foods WHERE REPLACE(name, ' ', '') = ? LIMIT ?")
     .all(q, MAX_RESULTS)
     .map(rowToRawFood);
   if (exact.length > 0) return exact;
 
   return database
     .prepare(
-      "SELECT * FROM raw_foods WHERE name LIKE ? ORDER BY length(name) ASC LIMIT ?"
+      "SELECT * FROM raw_foods WHERE REPLACE(name, ' ', '') LIKE ? ORDER BY length(name) ASC LIMIT ?"
     )
     .all(`%${q}%`, MAX_RESULTS)
     .map(rowToRawFood);

@@ -1,10 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon";
+import { saveCombo } from "@/lib/combos";
+import { supabase } from "@/lib/supabase";
+import type { Product } from "@/lib/types";
 import { useChildAge } from "@/lib/useChildAge";
 import { useKeyboardInset } from "@/lib/useKeyboardInset";
-import type { ChatReply, MatchedFood, Mood, MiniCard } from "@/lib/chatbot";
+import type { ChatReply, DietLogSuggestion, MatchedFood, Mood, MiniCard } from "@/lib/chatbot";
 
 const MOOD_IMAGES: Record<Mood, string> = {
   default: "/deundeuni-default.png",
@@ -94,6 +98,7 @@ type ChatMessage = {
   card?: MiniCard;
   recommendationCard?: MiniCard;
   alternatives?: MatchedFood[];
+  dietLogSuggestion?: DietLogSuggestion;
 };
 
 const GREETING = "안녕! 나는 든든이야. 지금 뭐 먹으려고?";
@@ -158,6 +163,7 @@ export default function ChatWidget() {
         recommendationCard: data.recommendationCard ?? undefined,
         alternatives:
           data.alternatives && data.alternatives.length > 0 ? data.alternatives : undefined,
+        dietLogSuggestion: data.dietLogSuggestion ?? undefined,
       });
       setMood(data.mood);
       if (data.recommendationCard) {
@@ -306,6 +312,37 @@ export default function ChatWidget() {
 
 function ChatBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
+  const suggestion = message.dietLogSuggestion;
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleAddToDiary() {
+    if (!suggestion) return;
+    setSaving(true);
+    setError(null);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      setSaving(false);
+      setError("로그인 후 이용할 수 있어요");
+      return;
+    }
+
+    const { error: saveError } = await saveCombo(
+      [suggestion.primary, suggestion.recommended] as unknown as Product[],
+      suggestion.feedbackMessage,
+      "",
+      false
+    );
+    setSaving(false);
+    if (saveError) {
+      setError(saveError);
+      return;
+    }
+    setSaved(true);
+  }
+
   return (
     // 바깥쪽에서 전체 너비를 확실히 갖고, 안쪽 그룹에만 85% 상한을 걸어야 유저/봇 말풍선의
     // 기준 너비가 똑같아진다 — 봇 쪽에만 아바타 이미지가 형제로 붙어 있으면 그만큼 flex 아이템
@@ -346,6 +383,37 @@ function ChatBubble({ message }: { message: ChatMessage }) {
                   <span className="text-xs font-bold text-gray-700">{alt.name}</span>
                 </div>
               ))}
+            </div>
+          )}
+
+          {suggestion && (
+            <div className="flex flex-col items-start gap-1">
+              {saved ? (
+                <p className="text-xs font-bold text-c-green">
+                  식단일기에 추가했어요! 📔
+                </p>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleAddToDiary}
+                    disabled={saving}
+                    className="rounded-2xl bg-c-green px-4 py-2 text-xs font-bold text-white shadow-sm transition active:scale-95 disabled:opacity-50"
+                  >
+                    {saving ? "추가하는 중..." : "두 음식 식단일기에 추가"}
+                  </button>
+                  {error && (
+                    <p className="text-xs font-bold text-c-red">
+                      {error}{" "}
+                      {error === "로그인 후 이용할 수 있어요" && (
+                        <Link href="/login" className="underline">
+                          로그인하기 →
+                        </Link>
+                      )}
+                    </p>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>
