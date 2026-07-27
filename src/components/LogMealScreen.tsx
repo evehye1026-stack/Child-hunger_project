@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import BackButton from "@/components/BackButton";
+import BareBackButton from "@/components/BareBackButton";
 import Icon from "@/components/Icon";
 import { saveCombo } from "@/lib/combos";
 import { getMealFeedback, sumProducts } from "@/lib/nutrition";
@@ -98,7 +98,7 @@ export default function LogMealScreen({ products }: Props) {
   return (
     <div className="flex h-dvh flex-col bg-cream sm:h-full">
       <header className="flex items-center gap-3 p-4">
-        <BackButton />
+        <BareBackButton />
         <div>
           <h1 className="text-xl font-bold text-gray-800">오늘 뭐 먹었어요?</h1>
           <p className="text-base text-gray-400">

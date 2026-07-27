@@ -236,7 +236,7 @@ export default function ChatWidget() {
 
   if (!open) {
     return (
-      <div className="absolute bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-40 flex flex-col items-end gap-1">
+      <div className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-40 flex flex-col items-end gap-1 sm:absolute">
         <div className="rounded-2xl bg-white px-3 py-1.5 text-xs font-bold text-gray-600 shadow-sm">
           {caption}
         </div>
@@ -255,7 +255,7 @@ export default function ChatWidget() {
 
   return (
     <div
-      className="absolute inset-x-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:inset-x-6"
+      className="fixed inset-x-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:absolute sm:inset-x-6"
       style={keyboardInset > 0 ? { bottom: keyboardInset } : undefined}
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-gray-100 bg-white p-3">

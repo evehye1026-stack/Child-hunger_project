@@ -34,7 +34,7 @@ export default function Home() {
             disabled={status === "loading"}
             className="text-base font-bold text-gray-400 transition active:scale-95 disabled:opacity-60"
           >
-            📍 {status === "loading" ? "찾는 중..." : hasRealLocation ? "내 위치" : "강서구"}
+            📍 {status === "loading" ? "찾는 중..." : "내 위치"}
           </button>
         </h1>
         {error && (
