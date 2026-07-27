@@ -255,8 +255,11 @@ export default function ChatWidget() {
 
   return (
     <div
-      className="fixed inset-x-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:absolute sm:inset-x-6"
-      style={keyboardInset > 0 ? { bottom: keyboardInset } : undefined}
+      className={`fixed inset-x-4 top-16 z-50 flex flex-col overflow-hidden rounded-3xl bg-cream shadow-2xl ring-1 ring-black/10 sm:absolute sm:inset-x-6 ${
+        keyboardInset > 0
+          ? "bottom-[env(safe-area-inset-bottom)]"
+          : "bottom-[calc(6rem+env(safe-area-inset-bottom))]"
+      }`}
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-gray-100 bg-white p-3">
         <MascotAvatar mood={mood} />
