@@ -19,10 +19,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
-  // 키보드가 뜰 때 레이아웃(dvh) 자체를 줄이지 않고 그 위에 얹히게 한다 — 그렇지 않으면
-  // 하단 탭바처럼 화면 전역에 고정된 UI까지 키보드 위로 같이 밀려 올라온다. 대신 채팅
-  // 패널은 ChatWidget에서 visualViewport 크기를 직접 재서 키보드 바로 위로 맞춘다.
-  interactiveWidget: "overlays-content",
+  // interactiveWidget을 지정하지 않으면 브라우저 기본 동작(키보드가 뜰 때 레이아웃
+  // 자체가 줄어듦)을 그대로 쓴다 — 그래야 dvh 기반 레이아웃과 fixed 위치들이 키보드
+  // 바로 위로 자연스럽게 따라 올라온다. 하단 탭바처럼 계속 떠 있으면 안 되는 전역 UI는
+  // useKeyboardInset으로 감지해 개별적으로 숨긴다.
   themeColor: "#fdf8ef",
 };
 

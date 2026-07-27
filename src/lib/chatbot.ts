@@ -1,4 +1,5 @@
 import { evaluateCarb, evaluateProtein, evaluateSodium } from "./ageNutrition";
+import { naturalizeReply } from "./gemini";
 import { getConvenienceProducts } from "./products";
 import { getIngredientEmoji, getProductsByMajorCategory } from "./productHelpers";
 import { nutritionScore } from "./nutrition";
@@ -181,13 +182,17 @@ export function matchFood(message: string): MatchResult {
 // 매칭된 음식(255개 큐레이션 또는 원본 전체) 하나를 나이 기준으로 평가하고,
 // 챗봇 말투 답변 한 줄로 압축한다. 평가 로직 자체(evaluateProtein/Sodium/Carb)는
 // 기존 것을 그대로 호출 — 여기서는 입력 정리와 문장 조합만 한다.
-export function buildChatReply(message: string, age: number): ChatReply {
+export async function buildChatReply(message: string, age: number): Promise<ChatReply> {
   const result = matchFood(message);
 
   if (!result.matched) {
+    const reply = await naturalizeReply(
+      "그 음식은 아직 몰라요! 대신 이런 건 어때요?",
+      "curious"
+    );
     return {
       matched: false,
-      reply: "그 음식은 아직 몰라요! 대신 이런 건 어때요?",
+      reply,
       card: null,
       recommendationCard: null,
       alternatives: result.suggestions,
@@ -203,9 +208,13 @@ export function buildChatReply(message: string, age: number): ChatReply {
   // (하나로 좁혀지는 경우, 예: "버섯소불고기도시락 먹고 싶다"는 바로 아래 평가로 진행된다.)
   if (alternatives.length > 0) {
     const query = extractFoodQuery(message);
+    const reply = await naturalizeReply(
+      `'${query}'(이)가 들어간 음식이 여러 개 있어요! 어떤 걸로 먹을지 말해줄래요?`,
+      "curious"
+    );
     return {
       matched: true,
-      reply: `'${query}'(이)가 들어간 음식이 여러 개 있어요! 어떤 걸로 먹을지 말해줄래요?`,
+      reply,
       card: null,
       recommendationCard: null,
       alternatives: [food, ...alternatives],
@@ -226,7 +235,7 @@ export function buildChatReply(message: string, age: number): ChatReply {
   const sodium = evaluateSodium(food, categoryPeers);
   const carb = evaluateCarb(food as unknown as Product);
 
-  let reply: string;
+  let draftReply: string;
   let mood: Mood;
   let recommendationCard: MiniCard | null = null;
   let dietLogSuggestion: DietLogSuggestion | null = null;
@@ -234,20 +243,24 @@ export function buildChatReply(message: string, age: number): ChatReply {
   if (!protein.sufficient && protein.recommendation) {
     const recommended = fromProduct(protein.recommendation);
     const feedbackMessage = `${food.name}은(는) 좋은데 단백질이 조금 부족해요. ${protein.recommendation.name} 같이 드셔보세요`;
-    reply = `${feedbackMessage}. 두 음식을 식단일기에 넣을까요?`;
+    draftReply = `${feedbackMessage}. 두 음식을 식단일기에 넣을까요?`;
     recommendationCard = toMiniCard(recommended);
     mood = "worried";
+    // 자연스럽게 다듬어진 reply와 별개로, 식단일기에 저장되는 feedbackMessage는
+    // Gemini를 거치지 않은 원본 사실 문장 그대로 유지한다 — 기록은 항상 일관돼야 하므로.
     dietLogSuggestion = { primary: food, recommended, feedbackMessage };
   } else if (sodium.percentile >= SODIUM_HIGH_PERCENTILE) {
-    reply = `${food.category} 중에서는 좀 짠 편이에요. 물도 챙겨 드세요`;
+    draftReply = `${food.category} 중에서는 좀 짠 편이에요. 물도 챙겨 드세요`;
     mood = "worried";
   } else if (carb.ratioPercent >= CARB_BALANCED_MIN && carb.ratioPercent <= CARB_BALANCED_MAX) {
-    reply = carb.message;
+    draftReply = carb.message;
     mood = "excited";
   } else {
-    reply = "이 조합 좋아요!";
+    draftReply = "이 조합 좋아요!";
     mood = "excited";
   }
+
+  const reply = await naturalizeReply(draftReply, mood);
 
   return {
     matched: true,

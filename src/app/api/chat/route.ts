@@ -22,6 +22,6 @@ export async function POST(request: NextRequest) {
     return Response.json({ needsAge: true });
   }
 
-  const reply = buildChatReply(message, age);
+  const reply = await buildChatReply(message, age);
   return Response.json({ needsAge: false, ...reply });
 }
